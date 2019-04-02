@@ -1,3 +1,8 @@
+Debug/
+Double-integral/Debug
+Entropy/Debug
+Matrix-connectivity/Debug
+.vs
 # Prerequisites
 *.d
 
