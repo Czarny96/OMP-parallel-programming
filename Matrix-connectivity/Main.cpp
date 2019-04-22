@@ -42,9 +42,14 @@ double SetMatrixD(int i, int j)
 // Time of SetAllMatrix() without omp: 0.149125
 void SetAllMatix()
 {
-	for (int i = 0; i < SIZE; i++)
+	int i, j;
+// Time of SetAllMatrix(): 0.0451867
+#pragma omp parallel for private(i, j) shared (matrixA, matrixB, matrixC, matrixD)
+	for (i = 0; i < SIZE; i++)
 	{
-		for (int j = 0; j < SIZE; j++)
+// Time of SetAllMatrix(): 0.0883677
+// #pragma omp parallel for private(j) shared (matrixA, matrixB, matrixC, matrixD)
+		for (j = 0; j < SIZE; j++)
 		{
 			matrixA[i][j] = SetMatrixA(i, j);
 			matrixB[i][j] = SetMatrixB(i, j);
@@ -59,11 +64,17 @@ void MultiplyingTheMatrix(double matrixA[SIZE][SIZE], double matrixB[SIZE][SIZE]
 {
 	int i, j, k;
 
+// Time of MultiplyingTheMatrix(..., ..., ...): 15.16
+#pragma omp parallel for private(i, j, k) shared (multiplyingMatrix)
 	for (i = 0; i < SIZE; i++)
 	{
+// Time of MultiplyingTheMatrix(..., ..., ...): 18.623
+// #pragma omp parallel for private(j, k) shared (multiplyingMatrix)
 		for (j = 0; j < SIZE; j++)
 		{
 			multiplyingMatrix[i][j] = 0;
+// Time of MultiplyingTheMatrix(..., ..., ...): 73.0614
+// #pragma omp parallel for private(k) shared (multiplyingMatrix)
 			for (k = 0; k < SIZE; k++)
 			{
 				multiplyingMatrix[i][j] += matrixA[i][k] * matrixB[k][j];
@@ -77,21 +88,26 @@ bool CheckingMatrixConnectivity(double matrixA[SIZE][SIZE], double matrixB[SIZE]
 {
 	int i, j;
 	double checksum = 0.0005;
+	bool result = true;
 
+	// Time of CheckingMatrixConnectivity(..., ..., ...): 0.0093586
+// #pragma omp parallel for private(i, j) shared (result)
 	for (i = 0; i < SIZE; i++)
 	{
+// Time of CheckingMatrixConnectivity(..., ..., ...): 0.0198929
+// #pragma omp parallel for private(j) shared (result)
 		for (j = 0; j < SIZE; j++)
 		{
 			if ((abs(matrixA[i][j] - matrixB[i][j]) >= checksum) &&
 				(abs(matrixA[i][j] - matrixC[i][j]) >= checksum) &&
 				(abs(matrixB[i][j] - matrixC[i][j]) >= checksum))
 			{
-				return false;
+				result = false;
 			}
 		}
 	}
 
-	return true;
+	return result;
 }
 
 int main()
@@ -139,7 +155,6 @@ int main()
 	cout << "Time of SetAllMatrix(): " << elapsedTimeOfSetAllMatrix.count() << endl;
 	cout << "Time of MultiplyingTheMatrix(..., ..., ...): " << elapsedTimeOfMultiplyingTheMatrix.count() << endl;
 	cout << "Time of CheckingMatrixConnectivity(..., ..., ...): " << elapsedTimeOfCheckingMatrixConnectivity.count() << endl;
-
 
 	getchar();
 	return 0;
