@@ -1,6 +1,7 @@
 #include <iostream>
 #include <omp.h>
 #include <chrono>
+#include <math.h>
 
 using namespace std;
 
@@ -38,6 +39,7 @@ double SetMatrixD(int i, int j)
 	return (((double)(i - j)) / (i + j + 4.0));
 }
 
+// Time of SetAllMatrix() without omp: 0.149125
 void SetAllMatix()
 {
 	for (int i = 0; i < SIZE; i++)
@@ -52,6 +54,7 @@ void SetAllMatix()
 	}
 }
 
+// Time of MultiplyingTheMatrix(..., ..., ...) without omp: 57.709
 void MultiplyingTheMatrix(double matrixA[SIZE][SIZE], double matrixB[SIZE][SIZE], double multiplyingMatrix[SIZE][SIZE])
 {
 	int i, j, k;
@@ -69,6 +72,28 @@ void MultiplyingTheMatrix(double matrixA[SIZE][SIZE], double matrixB[SIZE][SIZE]
 	}
 }
 
+// Time of CheckingMatrixConnectivity(..., ..., ...) without omp: 0.031708
+bool CheckingMatrixConnectivity(double matrixA[SIZE][SIZE], double matrixB[SIZE][SIZE], double matrixC[SIZE][SIZE])
+{
+	int i, j;
+	double checksum = 0.0005;
+
+	for (i = 0; i < SIZE; i++)
+	{
+		for (j = 0; j < SIZE; j++)
+		{
+			if ((abs(matrixA[i][j] - matrixB[i][j]) >= checksum) &&
+				(abs(matrixA[i][j] - matrixC[i][j]) >= checksum) &&
+				(abs(matrixB[i][j] - matrixC[i][j]) >= checksum))
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 int main()
 {
 	cout << "Hello Matrix" << endl;
@@ -78,7 +103,6 @@ int main()
 	auto timeSetAllMatrixFinish = chrono::high_resolution_clock::now();
 
 	chrono::duration<double> elapsedTimeOfSetAllMatrix = timeSetAllMatrixFinish - timeSetAllMatrixStart;
-	cout << "Time of SetAllMatrix(): " << elapsedTimeOfSetAllMatrix.count() << endl;
 
 	auto timeMultiplyingTheMatrixStart = chrono::high_resolution_clock::now();
 	
@@ -100,21 +124,21 @@ int main()
 	auto timeMultiplyingTheMatrixFinish = chrono::high_resolution_clock::now();
 
 	chrono::duration<double> elapsedTimeOfMultiplyingTheMatrix = timeMultiplyingTheMatrixFinish - timeMultiplyingTheMatrixStart;
-	cout << "Time of MultiplyingTheMatrix(..., ..., ...): " << elapsedTimeOfSetAllMatrix.count() << endl;
-
+	
 	auto timeCheckingMatrixConnectivityStart = chrono::high_resolution_clock::now();
 
-
-
-
-
-
+	if (CheckingMatrixConnectivity(firstCalculationResult, secoundCalculaionResult, thirdCalculationResult))
+		cout << "Matrices are connectivity" << endl;
+	else
+		cout << "Matrices are not connectivity" << endl;
 
 	auto timeCheckingMatrixConnectivityFinish = chrono::high_resolution_clock::now();
 
 	chrono::duration<double> elapsedTimeOfCheckingMatrixConnectivity = timeCheckingMatrixConnectivityFinish - timeCheckingMatrixConnectivityStart;
-	cout << "Time of CheckingMatrixConnectivity(): " << elapsedTimeOfSetAllMatrix.count() << endl;
-
+	
+	cout << "Time of SetAllMatrix(): " << elapsedTimeOfSetAllMatrix.count() << endl;
+	cout << "Time of MultiplyingTheMatrix(..., ..., ...): " << elapsedTimeOfMultiplyingTheMatrix.count() << endl;
+	cout << "Time of CheckingMatrixConnectivity(..., ..., ...): " << elapsedTimeOfCheckingMatrixConnectivity.count() << endl;
 
 
 	getchar();
