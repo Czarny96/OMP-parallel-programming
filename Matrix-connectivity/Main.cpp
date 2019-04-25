@@ -91,7 +91,7 @@ bool CheckingMatrixConnectivity(double matrixA[SIZE][SIZE], double matrixB[SIZE]
 	bool result = true;
 
 	// Time of CheckingMatrixConnectivity(..., ..., ...): 0.0093586
-// #pragma omp parallel for private(i, j) shared (result)
+#pragma omp parallel for private(i, j) shared (result)
 	for (i = 0; i < SIZE; i++)
 	{
 // Time of CheckingMatrixConnectivity(..., ..., ...): 0.0198929
