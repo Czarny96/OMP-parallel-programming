@@ -2,6 +2,8 @@ Debug/
 Double-integral/Debug
 Entropy/Debug
 Matrix-connectivity/Debug
+x64/
+Entropy/x64
 .vs
 # Prerequisites
 *.d
