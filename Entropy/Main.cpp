@@ -8,7 +8,7 @@
 using namespace std;
 
 #define NUMBEROFALLCUBE 10000
-#define NUMBEROFITERATIONS 1000
+#define NUMBEROFITERATIONS 100
 #define M_PI 3.14
 
 unsigned short cubeMatrix[NUMBEROFALLCUBE];
@@ -55,7 +55,7 @@ long double EntropyCalculation(int n, int matrix[6])
 int main()
 {
 	cout << "Hello Entropy" << endl;
-	// Time of set up value on cube matrix without OMP: 3.279e-05
+	// Time of set up value on cube matrix without OMP: 0.000103506 
 	auto timeSetUpValueOnCubeMatrixStart = chrono::high_resolution_clock::now();
 
 	int i, j;
@@ -101,7 +101,7 @@ int main()
 #pragma omp critical
 		cout << theSameValueOnCube[0] << ' ' << theSameValueOnCube[1] << ' ' << theSameValueOnCube[2] << ' '
 			<< theSameValueOnCube[3] << ' ' << theSameValueOnCube[4] << ' ' << theSameValueOnCube[5]  << " | "
-			<< entropy << " | " << sumOfAllCube << " | " << i << endl;
+			<< entropy << " | " << sumOfAllCube << endl;
 	}
 
 	auto timeCalculateFinish = chrono::high_resolution_clock::now();

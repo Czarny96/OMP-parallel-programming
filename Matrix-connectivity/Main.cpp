@@ -26,7 +26,7 @@ double SetMatrixA(int i, int j)
 
 double SetMatrixB(int i, int j)
 {
-	return (((double)(j)) / (2 * i + 3 * j));
+	return (((double)(j)) / (i + j + 3.0));
 }
 
 double SetMatrixC(int i, int j)
@@ -68,6 +68,7 @@ void MultiplyingTheMatrix(double matrixA[SIZE][SIZE], double matrixB[SIZE][SIZE]
 #pragma omp parallel for private(i, j, k) shared (multiplyingMatrix)
 	for (i = 0; i < SIZE; i++)
 	{
+
 // Time of MultiplyingTheMatrix(..., ..., ...): 18.623
 // #pragma omp parallel for private(j, k) shared (multiplyingMatrix)
 		for (j = 0; j < SIZE; j++)
@@ -90,6 +91,8 @@ bool CheckingMatrixConnectivity(double matrixA[SIZE][SIZE], double matrixB[SIZE]
 	double checksum = 0.0005;
 	bool result = true;
 
+	//matrixC[1][1] = 11.1111;
+
 	// Time of CheckingMatrixConnectivity(..., ..., ...): 0.0093586
 #pragma omp parallel for private(i, j) shared (result)
 	for (i = 0; i < SIZE; i++)
@@ -98,8 +101,8 @@ bool CheckingMatrixConnectivity(double matrixA[SIZE][SIZE], double matrixB[SIZE]
 // #pragma omp parallel for private(j) shared (result)
 		for (j = 0; j < SIZE; j++)
 		{
-			if ((abs(matrixA[i][j] - matrixB[i][j]) >= checksum) &&
-				(abs(matrixA[i][j] - matrixC[i][j]) >= checksum) &&
+			if ((abs(matrixA[i][j] - matrixB[i][j]) >= checksum) ||
+				(abs(matrixA[i][j] - matrixC[i][j]) >= checksum) ||
 				(abs(matrixB[i][j] - matrixC[i][j]) >= checksum))
 			{
 				result = false;
@@ -127,16 +130,16 @@ int main()
 	MultiplyingTheMatrix(matrixC, matrixD, tempMatrix2);
 	MultiplyingTheMatrix(tempMatrix1, tempMatrix2, firstCalculationResult);
 
-	// (((matrixA * matrixB) * matrixB) * matrixD)
+	// (((matrixA * matrixB) * matrixC) * matrixD)
 	MultiplyingTheMatrix(matrixA, matrixB, tempMatrix1);
 	MultiplyingTheMatrix(tempMatrix1, matrixC, tempMatrix2);
 	MultiplyingTheMatrix(tempMatrix2, matrixD, secoundCalculaionResult);
 
 	// (matrixA * (matrixB * (matrixC * matrixD)))
 	MultiplyingTheMatrix(matrixC, matrixD, tempMatrix1);
-	MultiplyingTheMatrix(tempMatrix1, matrixB, tempMatrix2);
-	MultiplyingTheMatrix(tempMatrix2, matrixA, secoundCalculaionResult);
-
+	MultiplyingTheMatrix(matrixB, tempMatrix1, tempMatrix2);
+	MultiplyingTheMatrix(matrixA, tempMatrix2, thirdCalculationResult);
+	
 	auto timeMultiplyingTheMatrixFinish = chrono::high_resolution_clock::now();
 
 	chrono::duration<double> elapsedTimeOfMultiplyingTheMatrix = timeMultiplyingTheMatrixFinish - timeMultiplyingTheMatrixStart;
@@ -144,10 +147,10 @@ int main()
 	auto timeCheckingMatrixConnectivityStart = chrono::high_resolution_clock::now();
 
 	if (CheckingMatrixConnectivity(firstCalculationResult, secoundCalculaionResult, thirdCalculationResult))
-		cout << "Matrices are connectivity" << endl;
+		cout << "Matrices are combined." << endl;
 	else
-		cout << "Matrices are not connectivity" << endl;
-
+		cout << "Matrices are not combined." << endl;
+		
 	auto timeCheckingMatrixConnectivityFinish = chrono::high_resolution_clock::now();
 
 	chrono::duration<double> elapsedTimeOfCheckingMatrixConnectivity = timeCheckingMatrixConnectivityFinish - timeCheckingMatrixConnectivityStart;
